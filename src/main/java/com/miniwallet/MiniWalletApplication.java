@@ -1,4 +1,4 @@
-package com.miniwallet.mini_wallet;
+package com.miniwallet;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
