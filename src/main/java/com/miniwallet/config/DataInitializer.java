@@ -35,7 +35,6 @@ public class DataInitializer implements CommandLineRunner {
         // Check if we have any users
         var users = userRepository.findAll();
         if (users.isEmpty()) {
-            System.out.println("No users found for sample data creation");
             return;
         }
 
@@ -48,23 +47,28 @@ public class DataInitializer implements CommandLineRunner {
                 // Check if user already has transactions
                 var existingTransactions = transactionService.getTransactionsByWallet(wallet);
                 if (existingTransactions.isEmpty()) {
-                    System.out.println("Creating sample transactions for user: " + user.getEmail());
 
                     // Create some sample transactions
-                    transactionService.createTransaction(wallet,
+                    transactionService.createTransaction(
+                            wallet,
                             new BigDecimal("1000.00"),
                             TransactionType.CREDIT,
-                            "Initial deposit");
+                            "Initial deposit",
+                            new BigDecimal("1000.00"));
 
-                    transactionService.createTransaction(wallet,
+                    transactionService.createTransaction(
+                            wallet,
                             new BigDecimal("250.50"),
                             TransactionType.DEBIT,
-                            "Transfer to John Doe");
+                            "Transfer to John Doe",
+                            new BigDecimal("749.50"));
 
-                    transactionService.createTransaction(wallet,
+                    transactionService.createTransaction(
+                            wallet,
                             new BigDecimal("500.00"),
                             TransactionType.CREDIT,
-                            "Fund wallet");
+                            "Fund wallet",
+                            new BigDecimal("1249.50"));
                 }
             }
         }
