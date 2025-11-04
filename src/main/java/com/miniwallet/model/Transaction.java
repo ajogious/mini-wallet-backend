@@ -13,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "transactions")
 public class Transaction {
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -38,19 +39,16 @@ public class Transaction {
     @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
-    // Constructors
     public Transaction() {
-        this.id = UUID.randomUUID();
+        // NO manual UUID generation here ❌
     }
 
     public Transaction(BigDecimal amount, TransactionType transactionType, String description,
             BigDecimal balanceAfterTransaction, Wallet wallet) {
-        this.id = UUID.randomUUID();
         this.amount = amount;
         this.transactionType = transactionType;
         this.description = description;
         this.balanceAfterTransaction = balanceAfterTransaction;
         this.wallet = wallet;
     }
-
 }
