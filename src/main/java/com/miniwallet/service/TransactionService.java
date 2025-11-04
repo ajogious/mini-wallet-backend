@@ -34,25 +34,6 @@ public class TransactionService {
     public Transaction createTransaction(Wallet wallet, BigDecimal amount, TransactionType type, String description,
             BigDecimal balanceAfterTransaction) {
 
-        // // BigDecimal newBalance;
-
-        // if (type == TransactionType.CREDIT) {
-        // balanceAfterTransaction = wallet.getBalance().add(amount);
-        // } else {
-        // balanceAfterTransaction = wallet.getBalance().subtract(amount);
-        // }
-
-        // wallet.setBalance(balanceAfterTransaction); // ✅ update wallet balance in
-        // memory
-        // walletService.saveWallet(wallet); // ✅ persist wallet balance update
-
-        // Transaction transaction = new Transaction(
-        // amount,
-        // type,
-        // description,
-        // balanceAfterTransaction,
-        // wallet);
-
         // return transactionRepository.save(transaction);
         Transaction transaction = new Transaction();
         transaction.setAmount(amount);

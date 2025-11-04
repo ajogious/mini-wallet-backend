@@ -1,6 +1,8 @@
 package com.miniwallet.controller;
 
 import com.miniwallet.dto.DepositRequest;
+import com.miniwallet.dto.TransferRequest;
+import com.miniwallet.dto.TransferResponse;
 import com.miniwallet.model.Transaction;
 import com.miniwallet.model.User;
 import com.miniwallet.model.Wallet;
@@ -86,6 +88,27 @@ public class WalletController {
                         response.put("transactionType", transaction.getTransactionType());
 
                         return ResponseEntity.ok(response);
+
+                } catch (RuntimeException e) {
+                        Map<String, Object> errorResponse = new HashMap<>();
+                        errorResponse.put("success", false);
+                        errorResponse.put("message", e.getMessage());
+                        return ResponseEntity.badRequest().body(errorResponse);
+                }
+        }
+
+        @PostMapping("/transfer")
+        public ResponseEntity<?> transfer(
+                        Principal principal,
+                        @Valid @RequestBody TransferRequest transferRequest) {
+
+                try {
+                        String email = principal.getName();
+                        User user = userRepository.findByEmail(email)
+                                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+                        TransferResponse transferResponse = walletService.transfer(user, transferRequest);
+                        return ResponseEntity.ok(transferResponse);
 
                 } catch (RuntimeException e) {
                         Map<String, Object> errorResponse = new HashMap<>();

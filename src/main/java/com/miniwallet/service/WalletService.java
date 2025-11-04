@@ -1,9 +1,12 @@
 package com.miniwallet.service;
 
+import com.miniwallet.dto.TransferRequest;
+import com.miniwallet.dto.TransferResponse;
 import com.miniwallet.model.Transaction;
 import com.miniwallet.model.TransactionType;
 import com.miniwallet.model.User;
 import com.miniwallet.model.Wallet;
+import com.miniwallet.repository.UserRepository;
 import com.miniwallet.repository.WalletRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ public class WalletService {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public Wallet createWalletForUser(User user) {
         if (walletRepository.existsByUser(user)) {
@@ -73,5 +79,71 @@ public class WalletService {
                 newBalance);
 
         return transaction;
+    }
+
+    @Transactional
+    public TransferResponse transfer(User sender, TransferRequest transferRequest) {
+        // Validate amount
+        if (transferRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Transfer amount must be greater than 0");
+        }
+
+        // Get sender's wallet
+        Wallet senderWallet = getWalletByUser(sender)
+                .orElseThrow(() -> new RuntimeException("Wallet not found for sender: " + sender.getEmail()));
+
+        // Check if sender has sufficient balance
+        if (senderWallet.getBalance().compareTo(transferRequest.getAmount()) < 0) {
+            throw new RuntimeException("Insufficient balance. Available: " + senderWallet.getBalance());
+        }
+
+        // Find recipient by email
+        User recipient = userRepository.findByEmail(transferRequest.getRecipientEmail())
+                .orElseThrow(() -> new RuntimeException(
+                        "Recipient not found with email: " + transferRequest.getRecipientEmail()));
+
+        // Check if sender is trying to transfer to themselves
+        if (sender.getId().equals(recipient.getId())) {
+            throw new RuntimeException("Cannot transfer funds to yourself");
+        }
+
+        // Get recipient's wallet (create if doesn't exist)
+        Wallet recipientWallet = getWalletByUser(recipient)
+                .orElseGet(() -> createWalletForUser(recipient));
+
+        // Perform transfer in a single transaction
+        // Debit sender
+        BigDecimal senderNewBalance = senderWallet.getBalance().subtract(transferRequest.getAmount());
+        senderWallet.setBalance(senderNewBalance);
+        walletRepository.save(senderWallet);
+
+        // Credit recipient
+        BigDecimal recipientNewBalance = recipientWallet.getBalance().add(transferRequest.getAmount());
+        recipientWallet.setBalance(recipientNewBalance);
+        walletRepository.save(recipientWallet);
+
+        // Create transactions for both parties
+        Transaction senderTransaction = transactionService.createTransaction(
+                senderWallet,
+                transferRequest.getAmount(),
+                TransactionType.DEBIT,
+                "Transfer to " + recipient.getEmail(),
+                senderNewBalance);
+
+        // Transaction recipientTransaction = transactionService.createTransaction(
+        // recipientWallet,
+        // transferRequest.getAmount(),
+        // TransactionType.CREDIT,
+        // "Transfer from " + sender.getEmail(),
+        // recipientNewBalance);
+
+        // Return transfer response
+        return new TransferResponse(
+                true,
+                "Transfer successful to " + recipient.getEmail(),
+                senderTransaction.getId(),
+                transferRequest.getAmount(),
+                recipient.getEmail(),
+                senderNewBalance);
     }
 }
