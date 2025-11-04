@@ -1,13 +1,13 @@
 package com.miniwallet.model;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-import org.hibernate.annotations.*;
-
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -16,8 +16,8 @@ import lombok.*;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @GeneratedValue
+    @Column(columnDefinition = "UUID DEFAULT gen_random_uuid()", updatable = false, nullable = false)
     private UUID id;
 
     @Column(nullable = false)
@@ -26,7 +26,7 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)

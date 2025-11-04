@@ -2,19 +2,25 @@ package com.miniwallet.service;
 
 import com.miniwallet.dto.*;
 import com.miniwallet.model.User;
+import com.miniwallet.model.Wallet;
 import com.miniwallet.repository.UserRepository;
 import com.miniwallet.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
 public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private WalletService walletService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -37,6 +43,9 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
+        // Automatically create wallet for the user
+        Wallet wallet = walletService.createWalletForUser(savedUser);
+
         // Generate JWT token
         String token = jwtUtil.generateToken(savedUser.getEmail());
 
@@ -45,7 +54,8 @@ public class AuthService {
                 savedUser.getId(),
                 savedUser.getFirstName(),
                 savedUser.getLastName(),
-                savedUser.getEmail());
+                savedUser.getEmail(),
+                wallet.getBalance());
 
         return new AuthResponse(token, "Registration successful", userResponse);
     }
@@ -64,6 +74,10 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
+        // Verify wallet exists, create if it doesn't (for backward compatibility)
+        Wallet wallet = walletService.getWalletByUser(user)
+                .orElseGet(() -> walletService.createWalletForUser(user));
+
         // Generate JWT token
         String token = jwtUtil.generateToken(user.getEmail());
 
@@ -72,7 +86,8 @@ public class AuthService {
                 user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getEmail());
+                user.getEmail(),
+                wallet.getBalance());
 
         return new AuthResponse(token, "Login successful", userResponse);
     }
