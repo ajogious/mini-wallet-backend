@@ -17,6 +17,9 @@ public class TransferRequest {
     @Email(message = "Recipient email should be valid")
     private String recipientEmail;
 
+    @NotBlank
+    private String pin;
+
     // Constructors
     public TransferRequest() {
     }
@@ -42,4 +45,13 @@ public class TransferRequest {
     public void setRecipientEmail(String recipientEmail) {
         this.recipientEmail = recipientEmail;
     }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
+    }
+
 }

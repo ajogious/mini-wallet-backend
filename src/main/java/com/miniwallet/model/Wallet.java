@@ -36,6 +36,9 @@ public class Wallet {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(name = "pin", length = 60)
+    private String pin;
+
     // Constructors
     public Wallet(User user) {
         this.user = user;
