@@ -1,6 +1,7 @@
 package com.miniwallet.service;
 
 import com.miniwallet.dto.*;
+import com.miniwallet.exception.CustomException;
 import com.miniwallet.model.User;
 import com.miniwallet.model.Wallet;
 import com.miniwallet.repository.UserRepository;
@@ -31,7 +32,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest registerRequest) {
         // Check if user already exists
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email is already registered");
+            throw new CustomException("Email is already registered", "EMAIL_ALREADY_EXISTS");
         }
 
         // Create new user
@@ -49,7 +50,7 @@ public class AuthService {
         // Generate JWT token
         String token = jwtUtil.generateToken(savedUser.getEmail());
 
-        // Create user response
+        // Create user response with wallet balance
         UserResponse userResponse = new UserResponse(
                 savedUser.getId(),
                 savedUser.getFirstName(),
@@ -64,24 +65,24 @@ public class AuthService {
         // Find user by email
         Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
         if (userOptional.isEmpty()) {
-            throw new RuntimeException("Invalid email or password");
+            throw new CustomException("Invalid email or password", "INVALID_CREDENTIALS");
         }
 
         User user = userOptional.get();
 
         // Check password
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new CustomException("Invalid email or password", "INVALID_CREDENTIALS");
         }
 
-        // Verify wallet exists, create if it doesn't (for backward compatibility)
+        // Verify wallet exists, create if it doesn't
         Wallet wallet = walletService.getWalletByUser(user)
                 .orElseGet(() -> walletService.createWalletForUser(user));
 
         // Generate JWT token
         String token = jwtUtil.generateToken(user.getEmail());
 
-        // Create user response
+        // Create user response with wallet balance
         UserResponse userResponse = new UserResponse(
                 user.getId(),
                 user.getFirstName(),
@@ -91,4 +92,5 @@ public class AuthService {
 
         return new AuthResponse(token, "Login successful", userResponse);
     }
+
 }
