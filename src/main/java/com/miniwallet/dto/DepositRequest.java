@@ -2,9 +2,13 @@ package com.miniwallet.dto;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+@Data
+@NoArgsConstructor
 public class DepositRequest {
 
     @NotNull(message = "Amount is required")
@@ -12,19 +16,8 @@ public class DepositRequest {
     private BigDecimal amount;
 
     // Constructors
-    public DepositRequest() {
-    }
-
     public DepositRequest(BigDecimal amount) {
         this.amount = amount;
     }
 
-    // Getters and Setters
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
 }

@@ -2,10 +2,15 @@ package com.miniwallet.dto;
 
 import com.miniwallet.model.TransactionType;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@NoArgsConstructor
+@Data
 public class TransactionResponse {
     private UUID id;
     private BigDecimal amount;
@@ -15,9 +20,6 @@ public class TransactionResponse {
     private LocalDateTime timestamp;
 
     // Constructors
-    public TransactionResponse() {
-    }
-
     public TransactionResponse(UUID id, BigDecimal amount, TransactionType transactionType,
             String description, BigDecimal balanceAfterTransaction, LocalDateTime timestamp) {
         this.id = id;
@@ -28,52 +30,4 @@ public class TransactionResponse {
         this.timestamp = timestamp;
     }
 
-    // Getters and Setters
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public TransactionType getTransactionType() {
-        return transactionType;
-    }
-
-    public void setTransactionType(TransactionType transactionType) {
-        this.transactionType = transactionType;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getBalanceAfterTransaction() {
-        return balanceAfterTransaction;
-    }
-
-    public void setBalanceAfterTransaction(BigDecimal balanceAfterTransaction) {
-        this.balanceAfterTransaction = balanceAfterTransaction;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
 }

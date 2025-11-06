@@ -3,6 +3,11 @@ package com.miniwallet.dto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class TransferResponse {
     private boolean success;
     private String message;
@@ -12,9 +17,6 @@ public class TransferResponse {
     private BigDecimal senderNewBalance;
 
     // Constructors
-    public TransferResponse() {
-    }
-
     public TransferResponse(boolean success, String message, UUID transactionId,
             BigDecimal amount, String recipientEmail, BigDecimal senderNewBalance) {
         this.success = success;
@@ -25,52 +27,4 @@ public class TransferResponse {
         this.senderNewBalance = senderNewBalance;
     }
 
-    // Getters and Setters
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public UUID getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(UUID transactionId) {
-        this.transactionId = transactionId;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getRecipientEmail() {
-        return recipientEmail;
-    }
-
-    public void setRecipientEmail(String recipientEmail) {
-        this.recipientEmail = recipientEmail;
-    }
-
-    public BigDecimal getSenderNewBalance() {
-        return senderNewBalance;
-    }
-
-    public void setSenderNewBalance(BigDecimal senderNewBalance) {
-        this.senderNewBalance = senderNewBalance;
-    }
 }

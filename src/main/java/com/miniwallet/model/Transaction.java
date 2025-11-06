@@ -2,6 +2,7 @@ package com.miniwallet.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -9,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Data
 @Entity
 @Table(name = "transactions")
@@ -38,10 +40,6 @@ public class Transaction {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
-
-    public Transaction() {
-        // NO manual UUID generation here ❌
-    }
 
     public Transaction(BigDecimal amount, TransactionType transactionType, String description,
             BigDecimal balanceAfterTransaction, Wallet wallet) {

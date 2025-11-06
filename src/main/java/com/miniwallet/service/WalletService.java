@@ -93,11 +93,6 @@ public class WalletService {
             throw new CustomException("Invalid PIN", "INVALID_PIN");
         }
 
-        System.out.println("=== STARTING TRANSFER ===");
-        System.out.println("Sender: " + sender.getEmail() + " (ID: " + sender.getId() + ")");
-        System.out.println("Recipient Email: " + transferRequest.getRecipientEmail());
-        System.out.println("Amount: " + transferRequest.getAmount());
-
         // Validate amount
         if (transferRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("Transfer amount must be greater than 0");
@@ -106,7 +101,6 @@ public class WalletService {
         // Get sender's wallet
         Wallet senderWallet = getWalletByUser(sender)
                 .orElseThrow(() -> new RuntimeException("Wallet not found for sender: " + sender.getEmail()));
-        System.out.println("Sender Wallet ID: " + senderWallet.getId() + ", Balance: " + senderWallet.getBalance());
 
         // Check if sender has sufficient balance
         if (senderWallet.getBalance().compareTo(transferRequest.getAmount()) < 0) {
@@ -117,7 +111,6 @@ public class WalletService {
         User recipient = userRepository.findByEmail(transferRequest.getRecipientEmail())
                 .orElseThrow(() -> new RuntimeException(
                         "Recipient not found with email: " + transferRequest.getRecipientEmail()));
-        System.out.println("Recipient Found: " + recipient.getEmail() + " (ID: " + recipient.getId() + ")");
 
         // Check if sender is trying to transfer to themselves
         if (sender.getId().equals(recipient.getId())) {
@@ -127,50 +120,27 @@ public class WalletService {
         // Get recipient's wallet (create if doesn't exist)
         Wallet recipientWallet = getWalletByUser(recipient)
                 .orElseGet(() -> {
-                    System.out.println("Creating new wallet for recipient");
                     return createWalletForUser(recipient);
                 });
-        System.out.println(
-                "Recipient Wallet ID: " + recipientWallet.getId() + ", Balance: " + recipientWallet.getBalance());
-
-        System.out.println("Sender balance before: " + senderWallet.getBalance());
-        System.out.println("Recipient balance before: " + recipientWallet.getBalance());
 
         // Perform transfer in a single transaction
         // Debit sender
         BigDecimal senderNewBalance = senderWallet.getBalance().subtract(transferRequest.getAmount());
         senderWallet.setBalance(senderNewBalance);
         walletRepository.save(senderWallet);
-        System.out.println("Sender balance after debit: " + senderNewBalance);
 
         // Credit recipient
         BigDecimal recipientNewBalance = recipientWallet.getBalance().add(transferRequest.getAmount());
         recipientWallet.setBalance(recipientNewBalance);
         walletRepository.save(recipientWallet);
-        System.out.println("Recipient balance after credit: " + recipientNewBalance);
 
         // Create transactions for both parties
-        System.out.println("Creating sender transaction...");
         Transaction senderTransaction = transactionService.createTransaction(
                 senderWallet,
                 transferRequest.getAmount(),
                 TransactionType.DEBIT,
                 "Transfer to " + recipient.getEmail(),
                 senderNewBalance);
-        System.out.println("Sender Transaction ID: " + senderTransaction.getId());
-
-        System.out.println("Creating recipient transaction...");
-        Transaction recipientTransaction = transactionService.createTransaction(
-                recipientWallet,
-                transferRequest.getAmount(),
-                TransactionType.CREDIT,
-                "Transfer from " + sender.getEmail(),
-                recipientNewBalance);
-        System.out.println("Recipient Transaction ID: " + recipientTransaction.getId());
-
-        System.out.println("=== TRANSFER COMPLETED ===");
-        System.out.println("Sender new balance: " + senderNewBalance);
-        System.out.println("Recipient new balance: " + recipientNewBalance);
 
         // Return transfer response
         return new TransferResponse(

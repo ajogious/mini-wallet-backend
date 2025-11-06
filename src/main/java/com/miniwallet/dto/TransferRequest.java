@@ -4,9 +4,13 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+@Data
+@NoArgsConstructor
 public class TransferRequest {
 
     @NotNull(message = "Amount is required")
@@ -21,37 +25,9 @@ public class TransferRequest {
     private String pin;
 
     // Constructors
-    public TransferRequest() {
-    }
-
     public TransferRequest(BigDecimal amount, String recipientEmail) {
         this.amount = amount;
         this.recipientEmail = recipientEmail;
-    }
-
-    // Getters and Setters
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getRecipientEmail() {
-        return recipientEmail;
-    }
-
-    public void setRecipientEmail(String recipientEmail) {
-        this.recipientEmail = recipientEmail;
-    }
-
-    public String getPin() {
-        return pin;
-    }
-
-    public void setPin(String pin) {
-        this.pin = pin;
     }
 
 }

@@ -109,7 +109,6 @@ public class WalletController {
                         User user = userRepository.findByEmail(email)
                                         .orElseThrow(() -> new RuntimeException("User not found"));
 
-                        // ✅ Include PIN from the request
                         TransferResponse transferResponse = walletService.transfer(user, transferRequest);
 
                         return ResponseEntity.ok(transferResponse);

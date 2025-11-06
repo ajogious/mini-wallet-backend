@@ -35,12 +35,6 @@ public class TransactionService {
     @Transactional
     public Transaction createTransaction(Wallet wallet, BigDecimal amount, TransactionType type, String description,
             BigDecimal balanceAfterTransaction) {
-        System.out.println(">>> Creating transaction in database:");
-        System.out.println("    Wallet ID: " + wallet.getId());
-        System.out.println("    Amount: " + amount);
-        System.out.println("    Type: " + type);
-        System.out.println("    Description: " + description);
-        System.out.println("    Balance After: " + balanceAfterTransaction);
 
         Transaction transaction = new Transaction();
         transaction.setAmount(amount);
@@ -50,7 +44,6 @@ public class TransactionService {
         transaction.setWallet(wallet);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
-        System.out.println(">>> Transaction saved with ID: " + savedTransaction.getId());
 
         return savedTransaction;
     }
@@ -70,17 +63,13 @@ public class TransactionService {
     }
 
     public Page<TransactionResponse> getTransactionsByUser(User user, Pageable pageable) {
-        System.out.println("=== FETCHING TRANSACTIONS FOR USER ===");
-        System.out.println("User: " + user.getEmail() + " (ID: " + user.getId() + ")");
 
         Optional<Wallet> walletOptional = walletService.getWalletByUser(user);
         if (walletOptional.isEmpty()) {
-            System.out.println("!!! No wallet found for user: " + user.getEmail());
             return Page.empty(pageable);
         }
 
         Wallet wallet = walletOptional.get();
-        System.out.println("User Wallet ID: " + wallet.getId());
 
         // Ensure we sort by timestamp descending
         Pageable sortedPageable = PageRequest.of(
@@ -90,17 +79,6 @@ public class TransactionService {
 
         Page<Transaction> transactionsPage = transactionRepository.findByWalletOrderByTimestampDesc(wallet,
                 sortedPageable);
-
-        System.out.println(
-                ">>> Found " + transactionsPage.getTotalElements() + " transactions for user: " + user.getEmail());
-
-        // Log each transaction found
-        transactionsPage.getContent().forEach(transaction -> {
-            System.out.println("    Transaction: " + transaction.getId() +
-                    " | " + transaction.getTransactionType() +
-                    " | " + transaction.getAmount() +
-                    " | " + transaction.getDescription());
-        });
 
         return transactionsPage.map(this::convertToResponse);
     }
