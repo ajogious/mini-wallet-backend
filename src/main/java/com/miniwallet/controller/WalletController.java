@@ -99,28 +99,6 @@ public class WalletController {
                 }
         }
 
-        // @PostMapping("/transfer")
-        // public ResponseEntity<?> transfer(
-        // Principal principal,
-        // @Valid @RequestBody TransferRequest transferRequest) {
-
-        // try {
-        // String email = principal.getName();
-        // User user = userRepository.findByEmail(email)
-        // .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // TransferResponse transferResponse = walletService.transfer(user,
-        // transferRequest);
-        // return ResponseEntity.ok(transferResponse);
-
-        // } catch (RuntimeException e) {
-        // Map<String, Object> errorResponse = new HashMap<>();
-        // errorResponse.put("success", false);
-        // errorResponse.put("message", e.getMessage());
-        // return ResponseEntity.badRequest().body(errorResponse);
-        // }
-        // }
-
         @PostMapping("/transfer")
         public ResponseEntity<?> transfer(
                         Principal principal,
@@ -201,6 +179,20 @@ public class WalletController {
                         errorResponse.put("message", e.getMessage());
                         return ResponseEntity.badRequest().body(errorResponse);
                 }
+        }
+
+        @GetMapping("/pin-status")
+        public ResponseEntity<?> getPinStatus(Principal principal) {
+                String email = principal.getName();
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+
+                boolean isDefaultPin = walletService.isDefaultPin(user);
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("isDefaultPin", isDefaultPin);
+
+                return ResponseEntity.ok(response);
         }
 
 }
